@@ -5,8 +5,9 @@ import os
 import unittest
 import urlparse
 
-from selenium.webdriver import ActionChains, DesiredCapabilities, Remote
-from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver import DesiredCapabilities, Remote
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 class Page(object):
     BASE_URL = 'http://ftest.stud.tech-mail.ru/'
@@ -40,19 +41,23 @@ class CreatePage(Page):
     def form(self):
         return CreateForm(self.driver)
 
+
 class TopicPage(Page):
     @property
     def topic(self):
         return Topic(self.driver)
+
 
 class BlogPage(Page):
     @property
     def topic(self):
         return Topic(self.driver)  
 
+
 class Component(object):
     def __init__(self, driver):
         self.driver = driver
+
 
 class AuthForm(Component):
     LOGIN = '//input[@name="login"]'
@@ -81,6 +86,7 @@ class TopMenu(Component):
             lambda d: d.find_element_by_xpath(self.USERNAME).text
         )  
 
+
 class CreateForm(Component):
     BLOGSELECT = '//a[@class="chzn-single"]'
     OPTION = '//li[text()="{}"]'
@@ -95,21 +101,22 @@ class CreateForm(Component):
     def blog_select_set_option(self, option_text):
         self.driver.find_element_by_xpath(self.OPTION.format(option_text)).click()
 
-    def set_title(self,title):
+    def set_title(self, title):
         self.driver.find_element_by_xpath(self.TITLE).send_keys(title)
 
-    def set_short_text(self,short_text):
+    def set_short_text(self, short_text):
         self.driver.find_element_by_xpath(self.SHORT_TEXT).send_keys(short_text)
     
-    def set_main_text(self,main_text):
+    def set_main_text(self, main_text):
         self.driver.find_element_by_xpath(self.MAIN_TEXT).send_keys(main_text)
 
     def submit(self):
         self.driver.find_element_by_xpath(self.CREATE_BUTTON).click()    
 
+
 class Topic(Component):
-    TITLE = '//*[@class="topic-title"]/a'
-    TEXT = '//*[@class="topic-content text"]/p'
+    TITLE = '//*[@class="topic-title"]/*'
+    TEXT = '//*[@class="topic-content text"]'
     BLOG = '//*[@class="topic-blog"]'
     DELETE_BUTTON = '//a[@class="actions-delete"]'
     DELETE_BUTTON_CONFIRM = '//input[@value="Удалить"]'
@@ -133,6 +140,13 @@ class Topic(Component):
 
 
 class ExampleTest(unittest.TestCase):
+    USERNAME = u'Дмитрий Котегов'
+    USEREMAIL = 'kotegov_dima@mail.ru'
+    PASSWORD = os.environ['TTHA2PASSWORD']
+    BLOG = 'Флудилка'
+    TITLE = u'ЗаГоЛоВоК'
+    MAIN_TEXT = u'Текст под катом! Отображается внутри топика!'
+
     def setUp(self):
         browser = os.environ.get('TTHA2BROWSER', 'CHROME')
 
@@ -145,53 +159,43 @@ class ExampleTest(unittest.TestCase):
         self.driver.quit()
 
     def test(self):
-        USERNAME = u'Дмитрий Котегов'
-        USEREMAIL = 'kotegov_dima@mail.ru'
-        PASSWORD = os.environ['TTHA2PASSWORD']
-        BLOG = 'Флудилка'
-        TITLE = u'ЗаГоЛоВоК'
-        SHORT_TEXT = u'Короткий текст, отображается в блогах!'
-        MAIN_TEXT = u'Текст под катом! Отображается внутри топика!'
-
         auth_page = AuthPage(self.driver)
         auth_page.open()
 
         auth_form = auth_page.form
         auth_form.open_form()
-        auth_form.set_login(USEREMAIL)
-        auth_form.set_password(PASSWORD)
+        auth_form.set_login(self.USEREMAIL)
+        auth_form.set_password(self.PASSWORD)
         auth_form.submit()
 
         user_name = auth_page.top_menu.get_username()
-        self.assertEqual(USERNAME, user_name)
+        self.assertEqual(self.USERNAME, user_name)
 
         create_page = CreatePage(self.driver)
         create_page.open()
 
         create_form = create_page.form
         create_form.blog_select_open()
-        create_form.blog_select_set_option(BLOG)
-        create_form.set_title(TITLE)
-        create_form.set_short_text(SHORT_TEXT)
-        create_form.set_main_text(MAIN_TEXT)
+        create_form.blog_select_set_option(self.BLOG)
+        create_form.set_title(self.TITLE)
+        create_form.set_main_text(self.MAIN_TEXT)
         create_form.submit()
 
         topic_page = TopicPage(self.driver)
         topic_title = topic_page.topic.get_title()
         topic_text = topic_page.topic.get_text()
-        self.assertEqual(TITLE,topic_title)
-        self.assertEqual(MAIN_TEXT,topic_text)
+        self.assertEqual(self.TITLE, topic_title)
+        self.assertEqual(self.MAIN_TEXT, topic_text)
 
         topic_page.topic.open_blog()
-
         blog_page = BlogPage(self.driver)
         topic_title = blog_page.topic.get_title()
         topic_text = blog_page.topic.get_text()
-        self.assertEqual(TITLE,topic_title)
-        self.assertEqual(SHORT_TEXT,topic_text)
+        self.assertEqual(self.TITLE, topic_title)
+        self.assertEqual(self.MAIN_TEXT, topic_text)
 
         blog_page.topic.delete()
         topic_title = blog_page.topic.get_title()
         topic_text = blog_page.topic.get_text()
-        self.assertNotEqual(TITLE,topic_title)
-        self.assertNotEqual(SHORT_TEXT,topic_text)
+        self.assertNotEqual(self.TITLE, topic_title)
+        self.assertNotEqual(self.MAIN_TEXT, topic_text)
