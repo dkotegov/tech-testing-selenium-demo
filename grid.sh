@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-java -jar selenium-server-standalone-2.48.2.jar \
+java -jar selenium-server-standalone-2.53.0.jar \
     -role hub
