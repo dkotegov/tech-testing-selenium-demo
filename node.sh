@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-java -jar selenium-server-standalone-2.53.0.jar \
+java -Dwebdriver.chrome.driver="./chromedriver" \
+    -Dwebdriver.gecko.driver="./geckodriver" \
+    -jar selenium-server-standalone-3.0.1.jar \
     -role node \
     -hub http://localhost:4444/grid/register \
-    -Dwebdriver.chrome.driver="./chromedriver" \
-    -browser browserName=chrome,maxInstances=1 \
-    -browser browserName=firefox,maxInstances=1
+    -browser browserName=chrome,maxInstances=2 \
+    -browser browserName=firefox,maxInstances=2

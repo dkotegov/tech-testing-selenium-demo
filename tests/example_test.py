@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class Page(object):
-    BASE_URL = 'http://ftest.stud.tech-mail.ru/'
+    BASE_URL = 'http://park.mail.ru/'
     PATH = ''
 
     def __init__(self, driver):
@@ -94,6 +94,7 @@ class CreateForm(Component):
     SHORT_TEXT = '//textarea[@name="text_short"]'
     MAIN_TEXT = '//textarea[@id="id_text"]'
     CREATE_BUTTON = '//button[contains(text(),"Создать")]'
+    PUBLISH_CHECKBOX = '//input[@name="publish"]'
 
     def blog_select_open(self):
         self.driver.find_element_by_xpath(self.BLOGSELECT).click()
@@ -111,7 +112,10 @@ class CreateForm(Component):
         self.driver.find_element_by_xpath(self.MAIN_TEXT).send_keys(main_text)
 
     def submit(self):
-        self.driver.find_element_by_xpath(self.CREATE_BUTTON).click()    
+        self.driver.find_element_by_xpath(self.CREATE_BUTTON).click()
+
+    def set_unpublish(self):
+        self.driver.find_element_by_xpath(self.PUBLISH_CHECKBOX).click()
 
 
 class Topic(Component):
@@ -136,19 +140,22 @@ class Topic(Component):
 
     def delete(self):
         self.driver.find_element_by_xpath(self.DELETE_BUTTON).click()
-        self.driver.find_element_by_xpath(self.DELETE_BUTTON_CONFIRM).click()    
+        confirm_button = WebDriverWait(self.driver, 30, 0.1).until(
+            lambda d: d.find_element_by_xpath(self.DELETE_BUTTON_CONFIRM)
+        )
+        confirm_button.click()
 
 
 class ExampleTest(unittest.TestCase):
     USERNAME = u'Дмитрий Котегов'
     USEREMAIL = 'kotegov_dima@mail.ru'
-    PASSWORD = os.environ['TTHA2PASSWORD']
+    PASSWORD = os.environ['PASSWORD']
     BLOG = 'Флудилка'
     TITLE = u'ЗаГоЛоВоК'
     MAIN_TEXT = u'Текст под катом! Отображается внутри топика!'
 
     def setUp(self):
-        browser = os.environ.get('TTHA2BROWSER', 'CHROME')
+        browser = os.environ.get('BROWSER', 'FIREFOX')
 
         self.driver = Remote(
             command_executor='http://127.0.0.1:4444/wd/hub',
@@ -179,6 +186,7 @@ class ExampleTest(unittest.TestCase):
         create_form.blog_select_set_option(self.BLOG)
         create_form.set_title(self.TITLE)
         create_form.set_main_text(self.MAIN_TEXT)
+        create_form.set_unpublish()
         create_form.submit()
 
         topic_page = TopicPage(self.driver)
@@ -187,13 +195,7 @@ class ExampleTest(unittest.TestCase):
         self.assertEqual(self.TITLE, topic_title)
         self.assertEqual(self.MAIN_TEXT, topic_text)
 
-        topic_page.topic.open_blog()
         blog_page = BlogPage(self.driver)
-        topic_title = blog_page.topic.get_title()
-        topic_text = blog_page.topic.get_text()
-        self.assertEqual(self.TITLE, topic_title)
-        self.assertEqual(self.MAIN_TEXT, topic_text)
-
         blog_page.topic.delete()
         topic_title = blog_page.topic.get_title()
         topic_text = blog_page.topic.get_text()
