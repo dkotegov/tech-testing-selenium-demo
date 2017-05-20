@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class Page(object):
-    BASE_URL = 'http://park.mail.ru/'
+    BASE_URL = 'http://ftest.tech-mail.ru/'
     PATH = ''
 
     def __init__(self, driver):
@@ -148,7 +148,7 @@ class Topic(Component):
 
 class ExampleTest(unittest.TestCase):
     USERNAME = u'Дмитрий Котегов'
-    USEREMAIL = 'kotegov_dima@mail.ru'
+    USEREMAIL = 'kotegov_dima@mail.ru.local'
     PASSWORD = os.environ['PASSWORD']
     BLOG = 'Флудилка'
     TITLE = u'ЗаГоЛоВоК'

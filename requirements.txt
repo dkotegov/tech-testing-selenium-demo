@@ -1,1 +1,1 @@
-selenium==3.0.1
+selenium==3.3.0
