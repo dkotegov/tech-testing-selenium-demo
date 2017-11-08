@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class Page(object):
-    BASE_URL = 'http://ftest.tech-mail.ru/'
+    BASE_URL = 'http://tech-mail.ru/'
     PATH = ''
 
     def __init__(self, driver):
@@ -148,14 +148,14 @@ class Topic(Component):
 
 class ExampleTest(unittest.TestCase):
     USERNAME = u'Дмитрий Котегов'
-    USEREMAIL = 'kotegov_dima@mail.ru.local'
+    USEREMAIL = 'kotegov_dima@mail.ru'
     PASSWORD = os.environ['PASSWORD']
     BLOG = 'Флудилка'
     TITLE = u'ЗаГоЛоВоК'
     MAIN_TEXT = u'Текст под катом! Отображается внутри топика!'
 
     def setUp(self):
-        browser = os.environ.get('BROWSER', 'FIREFOX')
+        browser = os.environ.get('BROWSER', 'CHROME')
 
         self.driver = Remote(
             command_executor='http://127.0.0.1:4444/wd/hub',
