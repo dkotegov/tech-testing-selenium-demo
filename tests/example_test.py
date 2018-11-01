@@ -19,7 +19,8 @@ class Page(object):
     def open(self):
         url = urlparse.urljoin(self.BASE_URL, self.PATH)
         self.driver.get(url)
-        self.driver.maximize_window()
+        # не работает из-за бага в последнем chromedriver под macos
+        # self.driver.maximize_window()
 
 
 class AuthPage(Page):
