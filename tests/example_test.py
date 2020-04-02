@@ -92,7 +92,8 @@ class CreateForm(Component):
     OPTION = '//li[text()="{}"]'
     TITLE = '//input[@name="title"]'
     SHORT_TEXT = '//textarea[@name="text_short"]'
-    MAIN_TEXT = '//textarea[@id="id_text"]'
+    MAIN_TEXT_FRAME = '//iframe[contains(@class,"cke_wysiwyg_frame")]'
+    MAIN_TEXT = '//body[contains(@class,"cke_editable")]'
     CREATE_BUTTON = '//button[contains(text(),"Создать")]'
     PUBLISH_CHECKBOX = '//input[@name="publish"]'
 
@@ -112,7 +113,9 @@ class CreateForm(Component):
         self.driver.find_element_by_xpath(self.SHORT_TEXT).send_keys(short_text)
     
     def set_main_text(self, main_text):
+        self.driver.switch_to.frame(self.driver.find_element_by_xpath(self.MAIN_TEXT_FRAME))
         self.driver.find_element_by_xpath(self.MAIN_TEXT).send_keys(main_text)
+        self.driver.switch_to.default_content()
 
     def submit(self):
         self.driver.find_element_by_xpath(self.CREATE_BUTTON).click()
