@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class Page(object):
-    BASE_URL = 'http://tech-mail.ru/'
+    BASE_URL = 'https://park.vk.company/'
     PATH = ''
 
     def __init__(self, driver):
